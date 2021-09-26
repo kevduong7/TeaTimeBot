@@ -35,14 +35,33 @@ async def on_message(message):
                 for i in copy.split()[2:]:
                     summName += i + ' '
                 summName = summName.strip(' ')
-                info = SynergyBot.get_ranked_stats(summName)[0]
-                
-                if(type(info) == str):
-                    await message.channel.send("User with that name does not exist")
-                else:
-                    winRate = (info['wins']/(info['wins'] + info['losses'])) * 100
+                try:
+                    info = SynergyBot.get_ranked_stats(summName)[0]
+                    
+                    if(type(info) == str):
+                        await message.channel.send("User with that name does not exist")
+                    else:
+                        winRate = (info['wins']/(info['wins'] + info['losses'])) * 100
 
-                    await message.channel.send("```css\nUSER: {0}\nRANK: {1} {2}\nWIN RATE: {3:.2f}%```".format(info['summonerName'], info['tier'], info['rank'], winRate))
+                        await message.channel.send("```css\nUSER: {0}\nRANK: {1} {2}\nWIN RATE: {3:.2f}%```".format(info['summonerName'], info['tier'], info['rank'], winRate))
+                except IndexError:
+                    await message.channel.send("```css\nUSER: {0}\nRANK: UNRANKED\nWIN RATE: 0%```".format(info['summonerName']))
+
+            elif (copy.split()[1] == 'cg' or copy.split()[1] == 'current_game'):
+                summName = ''
+                for i in copy.split()[2:]:
+                    summName += i + ' '
+                curGame = SynergyBot.get_current_match(summName)
+                fin = ""
+                counter = 0
+                for player in curGame['participants']:
+                    info = SynergyBot.get_ranked_stats(player['summonerName'])[0]
+                    
+                    
+                    winRate = (info['wins']/(info['wins'] + info['losses'])) * 100
+                    fin += "```css\nUSER: {0}\nRANK: {1} {2}\nWIN RATE: {3:.2f}%```".format(info['summonerName'], info['tier'], info['rank'], winRate)
+                    counter += 1
+                await message.channel.send(fin)
 
             else:
                 await message.channel.send('Invalid Command. \nType \"!ttb help\" to get a list of commands.')

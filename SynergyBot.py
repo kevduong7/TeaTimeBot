@@ -25,8 +25,33 @@ def get_ranked_stats(ign):
         else:
             raise
     
-    return my_ranked_stats
     
+    return my_ranked_stats
+
+def get_current_match(ign):
+    cur_game = {}
+    try:
+        user_name = lol_watcher.summoner.by_name(REGION, ign)
+        #matches = lol_watcher.match_v5.matchlist_by_puuid('AMERICAS', user_name['puuid'])
+        userStats = lol_watcher.league.by_summoner(REGION, user_name['id'])
+        
+        cur_game = lol_watcher.spectator.by_summoner(REGION, userStats[0]['summonerId'])
+        
+    except ApiError as err:
+        if err.response.status_code == 429:
+            print('We should retry in {} seconds.'.format(err.headers['Retry-After']))
+            print('this retry-after is handled by default by the RiotWatcher library')
+            print('future requests wait until the retry-after time passes')
+        elif err.response.status_code == 404:
+            print('Summoner with that name does not exist')
+        else:
+            raise
+    except IndexError:
+        print("This user does not have any ranked games played this season")
+    return cur_game
+    
+if __name__ == "__main__":
+    print(get_current_match("MAMMOTHMAN65"))
 
 # get_ranked_stats('Cat in a Box')
 # print(get_ranked_stats('Cat in a Box'))
