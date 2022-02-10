@@ -74,7 +74,7 @@ async def on_member_join(member):
     print("A new member has joined the server")
 
     channel = client.get_channel(CHANNEL_ID)
-    #await channel.send('ayyyy get in here')
+    
 
 @client.event
 async def on_member_remove(member):
